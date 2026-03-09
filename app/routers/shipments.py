@@ -1,48 +1,62 @@
 from fastapi import APIRouter
 from app.schemas.shipment import ShipmentCreate, ShipmentResponse
 
+from sqlmodel import Session, select
+from fastapi import Depends
+from app.database.db import get_session
+from app.models.shipment import Shipment
+
 router = APIRouter(
     prefix="/shipments",                            #Now the router automatically prefixes all endpoints with: /shipments
     tags=["Shipments"]
 )
 
-shipments = []
 
+@router.get("/", response_model=list[ShipmentResponse])
+def get_shipments(session: Session = Depends(get_session)):
 
-@router.get("/")
-def get_shipments():
+    shipments = session.exec(select(Shipment)).all()
+
     return shipments
 
 
 @router.post("/", response_model=ShipmentResponse)
-def create_shipment(shipment: ShipmentCreate):
+def create_shipment(shipment: ShipmentCreate, session: Session = Depends(get_session)):
 
-    shipment_id = len(shipments) + 1
+    db_shipment = Shipment(**shipment.model_dump())
 
-    shipment_data = shipment.model_dump()
-    shipment_data["id"] = shipment_id
+    session.add(db_shipment)            #Add to database
+    session.commit()                    #Save changes
+    session.refresh(db_shipment)        #Refresh object from DB
 
-    shipments.append(shipment_data)
+    return db_shipment
 
-    return shipment_data
+@router.get("/{shipment_id}", response_model=ShipmentResponse)
+def get_shipment(
+    shipment_id: int,
+    session: Session = Depends(get_session)
+):
 
+    shipment = session.get(Shipment, shipment_id)
 
-@router.get("/{shipment_id}")
-def get_shipment(shipment_id: int):
+    if not shipment:
+        return {"error": "Shipment not found"}
 
-    for shipment in shipments:
-        if shipment["id"] == shipment_id:
-            return shipment
-
-    return {"error": "Shipment not found"}
+    return shipment
 
 
 @router.delete("/{shipment_id}")
-def delete_shipment(shipment_id: int):
+def delete_shipment(
+    shipment_id: int,
+    session: Session = Depends(get_session)
+):
 
-    for shipment in shipments:
-        if shipment["id"] == shipment_id:
-            shipments.remove(shipment)
-            return {"message": "Shipment deleted"}
+    shipment = session.get(Shipment, shipment_id)
 
-    return {"error": "Shipment not found"}
+    if not shipment:
+        return {"error": "Shipment not found"}
+
+    session.delete(shipment)
+    session.commit()
+
+    return {"message": "Shipment deleted"}
