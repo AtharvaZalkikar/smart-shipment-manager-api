@@ -3,7 +3,7 @@ from app.routers import shipments
 
 app = FastAPI()
 
-app.include_router(shipments.router)
+app.include_router(shipments.router, prefix="/api/v1")
 
 
 @app.get("/")

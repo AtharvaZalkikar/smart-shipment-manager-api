@@ -1,17 +1,20 @@
 from fastapi import APIRouter
 from app.schemas.shipment import ShipmentCreate, ShipmentResponse
 
-router = APIRouter()
+router = APIRouter(
+    prefix="/shipments",                            #Now the router automatically prefixes all endpoints with: /shipments
+    tags=["Shipments"]
+)
 
 shipments = []
 
 
-@router.get("/shipments")
+@router.get("/")
 def get_shipments():
     return shipments
 
 
-@router.post("/shipments", response_model=ShipmentResponse)
+@router.post("/", response_model=ShipmentResponse)
 def create_shipment(shipment: ShipmentCreate):
 
     shipment_id = len(shipments) + 1
@@ -24,7 +27,7 @@ def create_shipment(shipment: ShipmentCreate):
     return shipment_data
 
 
-@router.get("/shipments/{shipment_id}")
+@router.get("/{shipment_id}")
 def get_shipment(shipment_id: int):
 
     for shipment in shipments:
@@ -34,7 +37,7 @@ def get_shipment(shipment_id: int):
     return {"error": "Shipment not found"}
 
 
-@router.delete("/shipments/{shipment_id}")
+@router.delete("/{shipment_id}")
 def delete_shipment(shipment_id: int):
 
     for shipment in shipments:
