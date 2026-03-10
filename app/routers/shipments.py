@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 from app.schemas.shipment import ShipmentCreate, ShipmentResponse
 from app.services import shipment_service
+from fastapi import HTTPException
 
 from sqlmodel import Session, select
 from fastapi import Depends
@@ -38,7 +39,7 @@ def get_shipment(
     shipment = shipment_service.get_shipment(session, shipment_id)
 
     if not shipment:
-        return {"error": "Shipment not found"}
+        raise HTTPException(status_code=404, detail="Shipment not found")
 
     return shipment
 
@@ -52,6 +53,6 @@ def delete_shipment(
     shipment = shipment_service.delete_shipment(session, shipment_id)
 
     if not shipment:
-        return {"error": "Shipment not found"}
-    
+        raise HTTPException( status_code=404, detail="Shipment not found")
+
     return {"message": "Shipment deleted"}
