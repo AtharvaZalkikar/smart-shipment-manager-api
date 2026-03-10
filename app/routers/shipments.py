@@ -13,12 +13,26 @@ router = APIRouter(
     tags=["Shipments"]
 )
 
-
 @router.get("/", response_model=list[ShipmentResponse])
-def get_shipments(session: Session = Depends(get_session)):
+def get_shipments(
+    limit: int = 10,
+    offset: int = 0,
+    sort_by: str = "id",
+    order: str = "asc",
+    status: str | None = None,
+    destination: str | None = None,
+    session: Session = Depends(get_session)
+):
 
-    return shipment_service.get_shipments(session)
-
+    return shipment_service.get_shipments(
+        session,
+        limit,
+        offset,
+        sort_by,
+        order,
+        status,
+        destination
+    )
 
 @router.post("/", response_model=ShipmentResponse)
 def create_shipment(shipment: ShipmentCreate, session: Session = Depends(get_session)):

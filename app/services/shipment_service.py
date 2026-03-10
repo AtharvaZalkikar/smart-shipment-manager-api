@@ -1,6 +1,9 @@
 from sqlmodel import Session, select
 from app.models.shipment import Shipment
 
+from sqlmodel import select, desc
+
+
 
 def create_shipment(session: Session, shipment_data: dict):
 
@@ -12,13 +15,43 @@ def create_shipment(session: Session, shipment_data: dict):
 
     return db_shipment
 
+def get_shipments(
+    session,
+    limit=10,
+    offset=0,
+    sort_by="id",
+    order="asc",
+    status=None,
+    destination=None
+):
 
-def get_shipments(session: Session):
+    allowed_fields = {"id", "destination", "status"}
 
-    shipments = session.exec(select(Shipment)).all()
+    if sort_by not in allowed_fields:
+        raise ValueError("Invalid sort field")
+
+    column = getattr(Shipment, sort_by)
+
+    if order == "desc":
+        column = desc(column)
+
+    query = select(Shipment)
+
+    # filtering
+    if status:
+        query = query.where(Shipment.status == status)
+
+    if destination:
+        query = query.where(Shipment.destination == destination)
+
+    shipments = session.exec(
+        query
+        .order_by(column)
+        .offset(offset)
+        .limit(limit)
+    ).all()
 
     return shipments
-
 
 def get_shipment(session: Session, shipment_id: int):
 
