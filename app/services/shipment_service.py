@@ -2,8 +2,15 @@ from sqlmodel import Session, select
 from app.models.shipment import Shipment
 
 from sqlmodel import select, desc
+from fastapi import HTTPException
 
-
+    
+VALID_STATUS_TRANSITIONS = {
+    "Created": ["Departed"],
+    "Departed": ["In Transit"],
+    "In Transit": ["Delivered"],
+    "Delivered": []
+}
 
 def create_shipment(session: Session, shipment_data: dict):
 
@@ -72,12 +79,27 @@ def delete_shipment(session: Session, shipment_id: int):
 
     return shipment
 
+
+
 def update_shipment(session, shipment_id: int, update_data: dict):
 
     shipment = session.get(Shipment, shipment_id)
 
     if not shipment:
         return None
+
+    if "status" in update_data:
+
+        current_status = shipment.status
+        new_status = update_data["status"]
+
+        allowed = VALID_STATUS_TRANSITIONS.get(current_status, [])
+
+        if new_status not in allowed:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Invalid status transition from {current_status} to {new_status}"
+            )
 
     for key, value in update_data.items():
         setattr(shipment, key, value)

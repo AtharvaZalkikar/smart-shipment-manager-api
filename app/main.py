@@ -28,7 +28,7 @@ SQLModel creates shipments table
 API ready
 '''
 
-app = FastAPI()
+app = FastAPI(lifespan=lifespan)
 
 app.include_router(shipments.router, prefix="/api/v1")             #Useful for API versioning and cleaner endpoints
 
