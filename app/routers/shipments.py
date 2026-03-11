@@ -1,12 +1,14 @@
 from fastapi import APIRouter
-from app.schemas.shipment import ShipmentCreate, ShipmentResponse
+
 from app.services import shipment_service
 from fastapi import HTTPException
 
 from sqlmodel import Session, select
 from fastapi import Depends
 from app.database.db import get_session
+from app.schemas.shipment import ShipmentCreate, ShipmentResponse,ShipmentUpdate
 from app.models.shipment import Shipment
+
 
 router = APIRouter(
     prefix="/shipments",                            #Now the router automatically prefixes all endpoints with: /shipments
@@ -70,3 +72,20 @@ def delete_shipment(
         raise HTTPException( status_code=404, detail="Shipment not found")
 
     return {"message": "Shipment deleted"}
+
+@router.patch("/{shipment_id}", response_model=ShipmentResponse)
+def update_shipment(
+    shipment_id: int,
+    shipment_update: ShipmentUpdate,
+    session: Session = Depends(get_session)):
+
+    updated_shipment = shipment_service.update_shipment(
+        session,
+        shipment_id,
+        shipment_update.model_dump(exclude_unset=True)
+    )
+
+    if not updated_shipment:
+        raise HTTPException(status_code=404, detail="Shipment not found")
+
+    return updated_shipment

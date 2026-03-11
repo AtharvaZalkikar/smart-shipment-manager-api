@@ -71,3 +71,19 @@ def delete_shipment(session: Session, shipment_id: int):
     session.commit()
 
     return shipment
+
+def update_shipment(session, shipment_id: int, update_data: dict):
+
+    shipment = session.get(Shipment, shipment_id)
+
+    if not shipment:
+        return None
+
+    for key, value in update_data.items():
+        setattr(shipment, key, value)
+
+    session.add(shipment)
+    session.commit()
+    session.refresh(shipment)
+
+    return shipment

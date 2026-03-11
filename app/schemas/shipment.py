@@ -1,5 +1,5 @@
 from pydantic import BaseModel #pydantic models
-
+from typing import Optional
 
 '''
 What request_model Does:
@@ -24,3 +24,8 @@ class ShipmentResponse(BaseModel):   #in production we want to control the respo
     id: int
     destination: str
     status: str
+
+# ShipmentResponse → response schema
+class ShipmentUpdate(BaseModel):
+    status: Optional[str] = None
+    destination: Optional[str] = None
