@@ -6,13 +6,13 @@ from sqlmodel import SQLModel
 from app.database.db import engine
 from app.models.shipment import Shipment
 
-def create_db_and_tables():
-    SQLModel.metadata.create_all(engine)
+# def create_db_and_tables():
+#     SQLModel.metadata.create_all(engine)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup logic
-    create_db_and_tables()
+#     create_db_and_tables()
     yield
     # Shutdown logic (not needed yet)
 
