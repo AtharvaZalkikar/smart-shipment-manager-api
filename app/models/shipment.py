@@ -9,3 +9,5 @@ class Shipment(SQLModel, table=True):
     status: ShipmentStatus = Field(default=ShipmentStatus.CREATED) #updated from str to use ENUMS in shipment_status.py
 
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))  #default_factory generates a new timestamp for every row.
+
+    updated_at: datetime | None = Field(default=None)

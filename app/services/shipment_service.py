@@ -3,6 +3,7 @@ from app.models.shipment import Shipment
 
 from sqlmodel import select, desc
 from fastapi import HTTPException
+from datetime import datetime, timezone
 
     
 VALID_STATUS_TRANSITIONS = {
@@ -103,6 +104,9 @@ def update_shipment(session, shipment_id: int, update_data: dict):
 
     for key, value in update_data.items():
         setattr(shipment, key, value)
+
+    # Update timestamp whenever shipment changes
+    shipment.updated_at = datetime.now(timezone.utc)
 
     session.add(shipment)
     session.commit()
