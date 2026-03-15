@@ -1,7 +1,7 @@
 from sqlmodel import Session, select
 from app.models.shipment import Shipment
 
-from sqlmodel import select, desc
+from sqlmodel import select, desc, func
 from fastapi import HTTPException
 from datetime import datetime, timezone
 
@@ -52,6 +52,10 @@ def get_shipments(
     if destination:
         query = query.where(Shipment.destination == destination)
 
+    # get total count
+    total_query = select(func.count()).select_from(query.subquery())
+    total = session.exec(total_query).one()
+
     shipments = session.exec(
         query
         .order_by(column)
@@ -59,7 +63,12 @@ def get_shipments(
         .limit(limit)
     ).all()
 
-    return shipments
+    return {
+        "items": shipments,
+        "total": total,
+        "limit": limit,
+        "offset": offset
+    }
 
 def get_shipment(session: Session, shipment_id: int):
 

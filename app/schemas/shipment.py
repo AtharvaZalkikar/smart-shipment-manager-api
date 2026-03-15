@@ -32,3 +32,10 @@ class ShipmentResponse(BaseModel):   #in production we want to control the respo
 class ShipmentUpdate(BaseModel):
     status: Optional[ShipmentStatus] = None #using ENUMS (preset values now)
     destination: Optional[str] = None
+
+# ShipmentResponse (pagination) → Pagination response schema
+class ShipmentListResponse(BaseModel):
+    items: list[ShipmentResponse]
+    total: int
+    limit: int
+    offset: int

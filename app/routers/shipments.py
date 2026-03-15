@@ -3,10 +3,10 @@ from fastapi import APIRouter
 from app.services import shipment_service
 from fastapi import HTTPException
 
-from sqlmodel import Session, select
+from sqlmodel import Session
 from fastapi import Depends
 from app.database.db import get_session
-from app.schemas.shipment import ShipmentCreate, ShipmentResponse,ShipmentUpdate
+from app.schemas.shipment import ShipmentCreate, ShipmentResponse, ShipmentUpdate, ShipmentListResponse
 from app.models.shipment import Shipment
 
 
@@ -15,7 +15,7 @@ router = APIRouter(
     tags=["Shipments"]
 )
 
-@router.get("/", response_model=list[ShipmentResponse])
+@router.get("/", response_model=ShipmentListResponse)
 def get_shipments(
     limit: int = 10,
     offset: int = 0,
