@@ -12,6 +12,7 @@ from alembic import context
 # Even if we don't directly use Shipment in this file, importing it registers the model so Alembic can detect the table.
 from sqlmodel import SQLModel
 from app.models.shipment import Shipment
+from app.models.user import User
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

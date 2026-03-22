@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from app.routers import shipments
+from app.routers import auth
 
 from sqlmodel import SQLModel
 from app.database.db import engine
@@ -31,6 +32,7 @@ API ready
 app = FastAPI(lifespan=lifespan)
 
 app.include_router(shipments.router, prefix="/api/v1")             #Useful for API versioning and cleaner endpoints
+app.include_router(auth.router, prefix="/api/v1")    #for auth API (JWT)
 
 @app.get("/")
 def root():

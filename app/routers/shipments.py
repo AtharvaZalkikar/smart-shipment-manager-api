@@ -9,6 +9,8 @@ from app.database.db import get_session
 from app.schemas.shipment import ShipmentCreate, ShipmentResponse, ShipmentUpdate, ShipmentListResponse
 from app.models.shipment import Shipment
 
+from app.core.dependencies import get_current_user
+from app.models.user import User
 
 router = APIRouter(
     prefix="/shipments",                            #Now the router automatically prefixes all endpoints with: /shipments
@@ -37,7 +39,7 @@ def get_shipments(
     )
 
 @router.post("/", response_model=ShipmentResponse)
-def create_shipment(shipment: ShipmentCreate, session: Session = Depends(get_session)):
+def create_shipment(shipment: ShipmentCreate, session: Session = Depends(get_session), current_user: User = Depends(get_current_user)):
 
     db_shipment = shipment_service.create_shipment(
         session,
@@ -63,7 +65,8 @@ def get_shipment(
 @router.delete("/{shipment_id}")
 def delete_shipment(
     shipment_id: int,
-    session: Session = Depends(get_session)
+    session: Session = Depends(get_session),
+    current_user: User = Depends(get_current_user)
 ):
 
     shipment = shipment_service.delete_shipment(session, shipment_id)
@@ -77,7 +80,8 @@ def delete_shipment(
 def update_shipment(
     shipment_id: int,
     shipment_update: ShipmentUpdate,
-    session: Session = Depends(get_session)):
+    session: Session = Depends(get_session),
+    current_user: User = Depends(get_current_user)):
 
     updated_shipment = shipment_service.update_shipment(
         session,
